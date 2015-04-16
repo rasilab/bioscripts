@@ -6,8 +6,6 @@ import itertools
 import gzip
 import sys
 
-myfile = sys.argv[1]
-
 def fastq_readlength_distribution( myfile ):
     readcount = 0
     readlengths = dict()
@@ -21,3 +19,4 @@ def fastq_readlength_distribution( myfile ):
             readcount += 1
     print( "%d reads processed"%readcount )
     print( readlengths )
+    return( readlengths )
