@@ -9,6 +9,9 @@ Returns pandas dataframe objects.
 '''
 
 def gff3parser( myfile ):
+    '''parses gff3 files and returns pandas dataframe.
+    input file can be gzipped.
+    '''
     if myfile.endswith('.gz'):
         filehandle = gzip.open( myfile )
     else:
@@ -30,6 +33,9 @@ def gff3parser( myfile ):
     return data
 
 def gff2parser( myfile ):
+    '''parses gff2 files and returns pandas dataframe.
+    input file can be gzipped.
+    '''
     if myfile.endswith('.gz'):
         filehandle = gzip.open( myfile )
     else:
