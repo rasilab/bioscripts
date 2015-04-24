@@ -26,8 +26,10 @@ def gff3parser( myfile ):
                                  'frame','attributes'],
                              converters = { 'attributes':
                                            lambda x:
-                                           {y.split('=') for y in
-                                           x.split(";")}
+                                           dict(
+                                           tuple(y.split('=')) for y in
+                                           x.split(";")
+                                           )
                                           }
                             )
     return data
