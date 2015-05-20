@@ -32,6 +32,10 @@ def gff3parser( myfile ):
                                            )
                                           }
                             )
+    data['attributes'] = data['attributes'].apply( lambda attribute:
+                                {key:urllib.unquote(attribute[key])
+                                            for key in attribute}
+                                             )
     return data
 
 def gff2parser( myfile ):
