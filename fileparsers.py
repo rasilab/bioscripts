@@ -6,6 +6,7 @@ import urllib
 '''
 Functions for parsing common bioinformatics file formats.
 Returns pandas dataframe objects.
+Dependencies: pandas, gzip, shlex, urllib
 '''
 
 def gff3parser( myfile ):
