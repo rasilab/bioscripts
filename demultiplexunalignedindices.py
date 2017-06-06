@@ -1,33 +1,34 @@
-from Bio.SeqIO.QualityIO import FastqGeneralIterator
+# This script will take as first input a fastq.gz file 
+# that contains unaligned indices.
+# The subsequent arguments can be all the indices in the
+# experiment that you want to demultiplex.
+# Separate each index by a space
 
-bases = ['A', 'C', 'T', 'G']
+import sys  # for getting command line arguments
+from Bio import SeqIO  # for bio sequence file input output
+import gzip  # for read write gzipped files
 
-indexdict = dict()
-originalindices =  ['GGCCAC', 'TAGTTG', 'CCGGTG', 'ATCGTG', 'CGAAAC', 'CGTACG',
-                    'CCACTC', 'GCTACC', 'ATCAGT', 'GCTCAT', 'AGGAAT', 'CTTTTG']
+inputfile = sys.argv[1]  # fastq file with unaligned indices
+indices = sys.argv[2:]  # these are the indices used in your expt
 
-for index in originalindices:
-    for position in range(len(index)):
-        for base in bases:
-            if index[position] == base: 
-                continue
-            newindex = index[:position] + base + index[position+1:]
-            indexdict[newindex] = index
-    
+# open fastq file for reading
+records = SeqIO.parse(gzip.open(inputfile), 'fastq')
+numberOfProcessedReads = 0  # keep track of how many reads are processed
 
-recordIterator = FastqGeneralIterator( open( '../rawfastq/Undetermined_S0.R1.fastq', 'r' ) )
+# open an output file for each index
+outputFiles = dict((index, gzip.open(index + '_' + inputfile, 'w'))
+                   for index in indices)
 
-numberOfProcessedReads = 0
-
-outputFiles = dict((index,open(index + '_extra.fastq','w')) for index in oldindices)
-
-for title, seq, qual in  recordIterator: #look at a fastq file for example of these lines.
-    numberOfProcessedReads += 1
-    newindex = title.split(':')[9]
-    if newindex in indexdict:
-        outputFiles[ indexdict[newindex] ].write("@%s\n%s\n+\n%s\n" % (title, seq, qual)) #format string for writing in fastq format.
+# iterate through fastq records
+for read in records:
+    # the 10th col separated by : is the index
+    index = read.description.split(':')[9]
+    if index in indices:  # if index in your list of indices, write it
+        SeqIO.write(read, outputFiles[index], 'fastq')
+    # print every nth record processed
     if numberOfProcessedReads % 100000 == 0:
-        print numberOfProcessedReads
-        
+        print(numberOfProcessedReads)
+    numberOfProcessedReads += 1
+
 for File in outputFiles.values():
     File.close()
